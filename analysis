@@ -1,12 +1,21 @@
 #!/usr/bin/env bash
-###############################################################################
-# analysis – answer the four research questions on a cleaned TSV
-# Usage: ./analysis <clean.tsv>
-###############################################################################
+##########################################################################################################################################################
+# Author: Bhavik Mistry
+# Student Number: 23841008
+# Purpose: Answer the four research questions on a cleaned TSV. Read the TSV file (made using preprocess code) of board games and report the most popular 
+#           game mechanics and domain, plus Pearson correlations between publication year/complexity and average rating.
+# How to run the file: ./analysis <clean.tsv>
+###########################################################################################################################################################
+
 if [ "$#" -ne 1 ]; then
   echo "Usage: $0 <clean.tsv>" >&2
     exit 1
     fi
+
+if [ ! -r "$1" ]; then
+      echo "Error: cannot read '$1'" >&2
+        exit 1
+fi
 
     FILE="$1"
     TAB=$'\t'
@@ -26,20 +35,17 @@ if [ "$#" -ne 1 ]; then
                                                     }
 
                                                       {
-                                                          # count mechanics
                                                               n = split($cMech, tmp, ",")
                                                                   for (i = 1; i <= n; i++) {
                                                                         v = trim(tmp[i])
                                                                               if (v != "") mech[v]++
                                                                                   }
-                                                                                      # count domains
                                                                                           n = split($cDom, tmp, ",")
                                                                                               for (i = 1; i <= n; i++) {
                                                                                                     v = trim(tmp[i])
                                                                                                           if (v != "") dom[v]++
                                                                                                               }
 
-                                                                                                                  # accumulate for correlations
                                                                                                                       yr   = $cYear + 0
                                                                                                                           rate = $cRate + 0
                                                                                                                               comp = $cComp + 0
@@ -49,14 +55,12 @@ if [ "$#" -ne 1 ]; then
                                                                                                                                         }
 
                                                                                                                                           END {
-                                                                                                                                              # most popular
                                                                                                                                                   for (m in mech) if (mech[m] > mmax) { mmax = mech[m]; bestM = m }
                                                                                                                                                       for (d in dom ) if (dom [d] > dmax) { dmax = dom [d]; bestD = d }
 
                                                                                                                                                           printf "The most popular game mechanics is %s found in %d games\n", bestM, mmax
                                                                                                                                                               printf "The most popular game domain is %s found in %d games\n\n", bestD, dmax
 
-                                                                                                                                                                  # Pearson correlations
                                                                                                                                                                       rYr   = (nY*sumYrRate   - sumYr*sumRate)   / sqrt((nY*sumYr2   - sumYr^2)   *(nY*sumRate2 - sumRate^2))
                                                                                                                                                                           rComp = (nC*sumCompRate - sumComp*sumRate) / sqrt((nC*sumComp2 - sumComp^2)*(nC*sumRate2 - sumRate^2))
 

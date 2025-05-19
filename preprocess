@@ -1,12 +1,21 @@
 #!/usr/bin/env bash
-###############################################################################
-# preprocess – clean a raw BGG “;” spreadsheet file into TSV
-# Usage: ./preprocess <rawfile.txt>  > clean.tsv
-###############################################################################
+####################################################################################################################################
+# Author: Bhavik Mistry
+# Student Number: 23841008
+# Purpose: Clean a semicolon-delimited raw dataset into a proper formatted TSV file by normalizing decimal points and line endings,
+#           converting separators to tabs and auto-filling missing IDs.
+# How to run the file: ./preprocess <rawfile.txt>  > clean.tsv
+####################################################################################################################################
+
 if [ "$#" -ne 1 ]; then
   echo "Usage: $0 <rawfile.txt>" >&2
     exit 1
     fi
+
+if [ ! -r "$1" ]; then
+      echo "Error: cannot read '$1'" >&2
+        exit 1
+fi
 
     RAW="$1"
     SEP=';'
