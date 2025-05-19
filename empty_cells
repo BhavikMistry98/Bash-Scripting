@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+# ----------------------------------------------------------
+#  empty_cells  –  count the empty cells in every column
+#  Usage:  empty_cells  <spreadsheet.txt>  <separator>
+#          separator is normally ';'  (a literal character)
+# ----------------------------------------------------------
+if [ "$#" -ne 2 ]; then
+    echo "Usage: empty_cells <file> <separator>" >&2
+        exit 1
+        fi
+
+        FILE=$1
+        SEP=$2
+
+        awk -v FS="$SEP" '
+        NR==1 {                             # header line
+            for (i=1;i<=NF;i++) hdr[i]=$i
+                next
+                }
+                {                                   # data lines
+                    for (i=1;i<=NF;i++)
+                            if ($i=="") cnt[i]++
+                            }
+                            END {
+                                for (i=1;i<=length(hdr);i++)
+                                        printf "%s: %d\n", hdr[i], cnt[i]+0   # +0 prints 0 instead of blank
+                                        }
+                                        ' "$FILE"
+

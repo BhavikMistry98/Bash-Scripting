@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+###############################################################################
+# preprocess – read raw BGG “;” spreadsheet on stdin, emit a clean TSV on stdout
+#
+#   • ‘;’ → TAB
+#   • CRLF → LF
+#   • 1,23  → 1.23      (comma decimal → dot decimal)
+#   • strip non-ASCII
+#   • fill missing IDs with fresh sequential integers
+###############################################################################
+
+SEP=';'
+TAB=$'\t'
+
+awk -v FS="$SEP" -v OFS="$SEP" '
+  BEGIN { maxID = 0 }
+    NR==1 { print; next }
+      {
+          if ($1 ~ /^[0-9]+$/ && $1+0 > maxID) maxID = $1+0
+              rows[NR] = $0
+                }
+                  END {
+                      newID = maxID
+                          for (i = 2; i <= NR; i++) {
+                                split(rows[i], f, FS)
+                                      if (f[1] == "") {
+                                              newID++
+                                                      f[1] = newID
+                                                            }
+                                                                  for (c = 1; c <= length(f); c++)
+                                                                          if (f[c] ~ /^[0-9]+,[0-9]+$/) gsub(/,/, ".", f[c])
+                                                                                line = f[1]
+                                                                                      for (c = 2; c <= length(f); c++) line = line OFS f[c]
+                                                                                            print line
+                                                                                                }
+                                                                                                  }
+                                                                                                  ' | \
+                                                                                                  tr -d '\r' | \
+                                                                                                  tr -cd '\11\12\40-\176' | \
+                                                                                                  tr "$SEP" "$TAB"
+
